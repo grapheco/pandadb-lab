@@ -6,7 +6,7 @@ import com.twitter.chill.{Input, KryoBase, Output, ScalaKryoInstantiator}
  * @Date: Created at 10:24 2020/12/17
  * @Modified By:
  */
-object ChillSerializer {
+object ChillSerializer{
 
   val kryo: KryoBase = {
     val instantiator = new ScalaKryoInstantiator()

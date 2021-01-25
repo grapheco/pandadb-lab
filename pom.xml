@@ -64,7 +64,6 @@
                             <goal>compile</goal>
                         </goals>
                     </execution>
-
                 </executions>
             </plugin>
             <plugin>
