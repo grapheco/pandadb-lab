@@ -4,7 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/kernel-performance-tests/kernel-performance-tests.iml" filepath="$PROJECT_DIR$/kernel-performance-tests/kernel-performance-tests.iml" />
       <module fileurl="file://$PROJECT_DIR$/pandadb-lab.iml" filepath="$PROJECT_DIR$/pandadb-lab.iml" />
-      <module fileurl="file://$PROJECT_DIR$/kernel/serialize.iml" filepath="$PROJECT_DIR$/kernel/serialize.iml" />
+      <module fileurl="file://$PROJECT_DIR$/serialize/serialize.iml" filepath="$PROJECT_DIR$/serialize/serialize.iml" />
     </modules>
   </component>
 </project>
