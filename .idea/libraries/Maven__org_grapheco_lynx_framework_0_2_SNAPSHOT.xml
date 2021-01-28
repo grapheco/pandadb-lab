@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.grapheco:lynx-framework:0.2-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/grapheco/lynx-framework/0.2-SNAPSHOT/lynx-framework-0.2-20210127.081824-8.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/grapheco/lynx-framework/0.2-SNAPSHOT/lynx-framework-0.2-20210127.081824-8-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/grapheco/lynx-framework/0.2-SNAPSHOT/lynx-framework-0.2-20210127.081824-8-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
