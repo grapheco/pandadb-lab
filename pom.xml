@@ -11,6 +11,8 @@
     <modules>
         <module>serialize</module>
         <module>kernel-performance-tests</module>
+        <module>kernel</module>
+        <module>tools</module>
     </modules>
 
     <properties>
