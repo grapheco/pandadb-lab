@@ -7,7 +7,7 @@ import cn.pandadb.kernel.kv.index.IndexStoreAPI
 import cn.pandadb.kernel.kv.meta.Statistics
 import cn.pandadb.kernel.kv.node.NodeStoreAPI
 import cn.pandadb.kernel.kv.relation.RelationStoreAPI
-import cn.pandadb.kernel.store.{NodeStoreSPI, RelationStoreSPI, StoredNodeWithProperty}
+import cn.pandadb.kernel.store.{NodeStoreSPI, PandaNode, RelationStoreSPI, StoredNodeWithProperty}
 import cn.pandadb.kernel.util.Profiler
 import org.grapheco.lynx.{LynxNull, LynxValue, NodeFilter, RelationshipFilter}
 import org.opencypher.v9_0.expressions.SemanticDirection
@@ -15,6 +15,8 @@ import org.opencypher.v9_0.expressions.SemanticDirection
 import scala.util.Random
 import java.io.BufferedReader
 import java.io.FileInputStream
+
+import scala.collection.mutable.ArrayBuffer
 
 object LdbcTest {
   var nodeStore: NodeStoreSPI = _
@@ -107,6 +109,39 @@ object LdbcTest {
         ).mapValues(_.getOrElse(LynxNull))
     }
   }
+
+  def LDBC_short1_store_api1(id:String): Iterable[Map[String, Any]] = {
+    val results = ArrayBuffer[Map[String,Any]]()
+    val nodes = graphFacade.nodes( NodeFilter(Seq("person"), Map("id"->LynxValue(id))))
+    val edgeTypeId = relationStore.getRelationTypeId("isLocatedIn")
+    val toNodeLabelId = nodeStore.getLabelId("place")
+    nodes.foreach(startNode => {
+      val outEdges = relationStore.findOutRelations(startNode.id.value.asInstanceOf[Long], Some(edgeTypeId))
+      outEdges.foreach(relation => {
+        val endNode = nodeStore.getNodeById(relation.to, Some(toNodeLabelId)).get
+        results.append(Map[String,Any](
+          "firstName" -> startNode.property("firstName"),
+          "lastName" -> startNode.property("lastName"),
+          "birthday" -> startNode.property("birthday"),
+          "locationIP" -> startNode.property("locationIP"),
+          "browserUsed" -> startNode.property("browserUsed"),
+          "cityId" -> endNode.properties(nodeStore.getPropertyKeyId("id")),
+          "gender" -> startNode.property("gender"),
+          "creationDate" -> startNode.property("creationDate"),
+        ))
+      })
+    })
+    results
+  }
+
+
+  def LDBC_short1_filterNode(id:String): Iterator[PandaNode] = {
+    val results = ArrayBuffer[Map[String,Any]]()
+    val nodes = graphFacade.nodes( NodeFilter(Seq("person"), Map("id"->LynxValue(id))))
+    nodes
+  }
+
+
 
   def LDBC_short2(id: String): Iterator[Map[String, LynxValue]] ={
     graphFacade.paths(
