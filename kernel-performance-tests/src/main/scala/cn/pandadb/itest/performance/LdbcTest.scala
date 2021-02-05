@@ -7,7 +7,7 @@ import cn.pandadb.kernel.kv.index.IndexStoreAPI
 import cn.pandadb.kernel.kv.meta.Statistics
 import cn.pandadb.kernel.kv.node.NodeStoreAPI
 import cn.pandadb.kernel.kv.relation.RelationStoreAPI
-import cn.pandadb.kernel.store.{NodeStoreSPI, PandaNode, RelationStoreSPI, StoredNodeWithProperty}
+import cn.pandadb.kernel.store.{NodeStoreSPI, PandaNode, RelationStoreSPI, StoredNodeWithProperty, StoredRelation}
 import cn.pandadb.kernel.util.Profiler
 import org.grapheco.lynx.{LynxNull, LynxValue, NodeFilter, RelationshipFilter}
 import org.opencypher.v9_0.expressions.SemanticDirection
@@ -135,11 +135,59 @@ object LdbcTest {
   }
 
 
+
+
   def LDBC_short1_filterNode(id:String): Iterator[PandaNode] = {
     val results = ArrayBuffer[Map[String,Any]]()
     val nodes = graphFacade.nodes( NodeFilter(Seq("person"), Map("id"->LynxValue(id))))
     nodes
   }
+
+  def LDBC_short1_filterNodefindOutRelations(id:String): Unit = {
+    val results = ArrayBuffer[Map[String,Any]]()
+    val nodes = graphFacade.nodes( NodeFilter(Seq("person"), Map("id"->LynxValue(id))))
+    val edgeTypeId = relationStore.getRelationTypeId("isLocatedIn")
+    val toNodeLabelId = nodeStore.getLabelId("place")
+    nodes.foreach(startNode => {
+      val outEdges = relationStore.findOutRelations(startNode.id.value.asInstanceOf[Long], Some(edgeTypeId))
+      outEdges.foreach(r => println(s"${r.id} ${r.from} ${r.to}"))
+    })
+  }
+
+  def LDBC_short1_filterNodefindOutRelations2(id:String): Unit = {
+    val results = ArrayBuffer[Map[String,Any]]()
+    val nodes = graphFacade.nodes( NodeFilter(Seq("person"), Map("id"->LynxValue(id))))
+    val edgeTypeId = relationStore.getRelationTypeId("isLocatedIn")
+    val toNodeLabelId = nodeStore.getLabelId("place")
+    nodes.foreach(startNode => {
+      val outEdges = relationStore.findOutRelations(startNode.id.value.asInstanceOf[Long], Some(edgeTypeId))
+      outEdges.length
+    })
+  }
+
+  def LDBC_short1_onlyfindOutRelations(startNode:Long): Long = {
+    val edgeTypeId = relationStore.getRelationTypeId("isLocatedIn")
+    val toNodeLabelId = nodeStore.getLabelId("place")
+
+    val outEdges = relationStore.findOutRelations(startNode.asInstanceOf[Long], Some(edgeTypeId))
+    outEdges.length
+  }
+
+  def LDBC_short1_onlyfindOutRelations2(startNode:Long): Unit = {
+    val edgeTypeId = relationStore.getRelationTypeId("isLocatedIn")
+    val toNodeLabelId = nodeStore.getLabelId("place")
+
+    val outEdges = relationStore.findOutRelations(startNode.asInstanceOf[Long], Some(edgeTypeId))
+    outEdges.foreach(println)
+  }
+
+
+  def LDBC_short1_onlyGetToNode(placeId:Long): StoredNodeWithProperty = {
+    val toNodeLabelId = nodeStore.getLabelId("place")
+    val n = nodeStore.getNodeById(placeId, Some(toNodeLabelId)).get
+    n
+  }
+
 
 
 
