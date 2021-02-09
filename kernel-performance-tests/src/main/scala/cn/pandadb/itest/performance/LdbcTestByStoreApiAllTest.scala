@@ -1,24 +1,20 @@
 package cn.pandadb.itest.performance
 
-import java.io.{File, FileInputStream, InputStreamReader}
+import java.io.{BufferedReader, FileInputStream, InputStreamReader}
 
 import cn.pandadb.kernel.kv.GraphFacade
 import cn.pandadb.kernel.kv.index.IndexStoreAPI
 import cn.pandadb.kernel.kv.meta.Statistics
 import cn.pandadb.kernel.kv.node.NodeStoreAPI
 import cn.pandadb.kernel.kv.relation.RelationStoreAPI
-import cn.pandadb.kernel.store.{NodeStoreSPI, PandaNode, RelationStoreSPI, StoredNodeWithProperty, StoredRelation}
+import cn.pandadb.kernel.store.{NodeStoreSPI, RelationStoreSPI, StoredNodeWithProperty}
 import cn.pandadb.kernel.util.Profiler
-import org.grapheco.lynx.{LynxNull, LynxValue, NodeFilter, RelationshipFilter}
-import org.opencypher.v9_0.expressions.SemanticDirection
-
-import scala.util.Random
-import java.io.BufferedReader
-import java.io.FileInputStream
+import org.grapheco.lynx.{LynxNull, LynxValue, NodeFilter}
 
 import scala.collection.mutable.ArrayBuffer
+import scala.util.Random
 
-object LdbcTestByStoreApi {
+object LdbcTestByStoreApiAllTest {
   var nodeStore: NodeStoreSPI = _
   var relationStore: RelationStoreSPI = _
   var indexStore: IndexStoreAPI = _
@@ -33,9 +29,9 @@ object LdbcTestByStoreApi {
     val dbPath = args(0)
     println(s"数据路径： ${dbPath}")
 
-    var personId = Array("700000002540559", "708796094477119", "719791211845135", "728587303793103", "724189257648007", "700000003592071", "700000001856967", "717592187897287", "719791210631319", "719791211872543", "704398049851831", "700000001884183", "730786326912663", "726388282248071", "706597073343615", "715393163980831", "713194141415295", "724189256634711", "721990233113431", "713194140097367", "708796095517375", "702199023334903", "700000001229487", "717592186099143", "732985348893615", "713194139597231", "704398046691111", "717592186219303", "704398050067911", "710995116332047", "706597073323975", "702199023261503", "713194140404639")
-    var postId = Array("787032086215979", "787032086215980", "787032086215981", "787032086215982", "787032086215983", "787032086215984", "787032086215985", "787032086215986", "787032086215987", "716663342038324", "646294597860670", "716663342038354", "787032086216038", "751847714127216", "857400830393722", "681478969949592", "751847714127266", "716663342038444", "892585202482614", "927769574571466", "822216458305000", "822216458305020", "927769574571526", "857400830393872", "927769574571546", "716663342038574", "857400830393912", "892585202482764", "857400830393942", "751847714127456")
-    var commentId = Array("827766353710741", "827766353710742", "827766353710743", "827766353710744", "827766353710745", "827766353710746", "827766353710747", "827766353710748", "827766353710749", "827766353710750", "827766353710751", "827766353710752", "827766353710753", "827766353710754", "827766353710755", "827766353710756", "827766353710757", "827766353710758", "827766353710759", "827766353710760", "475922632822442", "475922632822443", "475922632822444", "475922632822445", "475922632822446", "475922632822447", "475922632822448", "475922632822449", "475922632822450", "475922632822451", "475922632822452", "475922632822453", "475922632822454")
+    var personIds = Array("700000002540559", "708796094477119")
+    var postIds = Array("787032086215979", "787032086215980")
+    var commentIds = Array("827766353710741", "827766353710742")
 
     if(args.length > 1) {
       val idPath: String = args(1)
@@ -44,9 +40,9 @@ object LdbcTestByStoreApi {
         val br = new BufferedReader(new InputStreamReader(new FileInputStream(idPath)))
         var linestr = null //按行读取 将每次读取一行的结果赋值给linestr
 
-        personId = br.readLine().split(',')
-        postId = br.readLine().split(',')
-        commentId = br.readLine().split(',')
+        personIds = br.readLine().split(',')
+        postIds = br.readLine().split(',')
+        commentIds = br.readLine().split(',')
 
         br.close() //关闭IO
 
@@ -56,21 +52,18 @@ object LdbcTestByStoreApi {
           e.printStackTrace()
       }
     }
-    var testTimes:Int = 1
-    if (args.length > 2) {
-      testTimes = args(2).toInt
-    }
 
     setup(dbPath)
     val begin = System.currentTimeMillis()
     println(s"已创建Facade | time: ${begin}")
     println("开始测试")
-    LDBC(personId=personId, postId = postId, commentId = commentId, times = testTimes)
+    LDBC(personIds=personIds, postIds = postIds, commentIds = commentIds)
     val end = System.currentTimeMillis()
     val use = end - begin
     println(s"测试结束 | time(Millis): ${use}  ")
 
     graphFacade.close()
+
   }
 
 
@@ -91,26 +84,6 @@ object LdbcTestByStoreApi {
     )
   }
 
-
-//
-//  def LDBC_short1(id: String): Iterator[Map[String, LynxValue]] ={
-//    graphFacade.paths(
-//      NodeFilter(Seq("person"), Map("id"->LynxValue(id))),
-//      RelationshipFilter(Seq("isLocatedIn"),Map()), NodeFilter(Seq("place"), Map()),SemanticDirection.OUTGOING
-//    ).map{
-//      p =>
-//        Map(
-//          "firstName" -> p.startNode.property("firstName"),
-//          "lastName" -> p.startNode.property("lastName"),
-//          "birthday" -> p.startNode.property("birthday"),
-//          "locationIP" -> p.startNode.property("locationIP"),
-//          "browserUsed" -> p.startNode.property("browserUsed"),
-//          "cityId" -> p.endNode.property("id"),
-//          "gender" -> p.startNode.property("gender"),
-//          "creationDate" -> p.startNode.property("creationDate"),
-//        ).mapValues(_.getOrElse(LynxNull))
-//    }
-//  }
 
   def LDBC_short1(id:String): Iterable[Map[String, Any]] = {
     val results = ArrayBuffer[Map[String,Any]]()
@@ -353,58 +326,124 @@ object LdbcTestByStoreApi {
   }
 
 
+  def LDBC(personIds:Array[String], postIds:Array[String], commentIds:Array[String]): Unit ={
+    println(s"personId: ${personIds.toList}")
+    println(s"postId: ${postIds.toList}")
+    println(s"commentId: ${commentIds.toList}")
 
-  def LDBC(personId:Array[String], postId:Array[String], commentId:Array[String], times: Int): Unit ={
-
-    println(s"personId: ${personId.toList}")
-    println(s"postId: ${postId.toList}")
-    println(s"commentId: ${commentId.toList}")
-    println(s"times: $times")
+    val timeUsed = scala.collection.mutable.ArrayBuffer[String]()
 
     Profiler.timing({
       println("preheat")
-      LDBC_short2(randomId(personId)).foreach(println)
+      LDBC_short2(randomId(personIds)).foreach(println)
     })
+
     Profiler.timing({
       println("interactive-short-1.cypher")
-      for (i <- 0 until times)
-        LDBC_short1(randomId(personId)).foreach(println)
+      println(s"persons length: ${personIds.length}")
+      val t0 =System.currentTimeMillis()
+      for (i <- 0 until personIds.length) {
+        val t1 = System.currentTimeMillis()
+        LDBC_short1(personIds(i)).foreach(println)
+        val used = System.currentTimeMillis() - t1
+        println(s"used(ms): ${used}")
+      }
+      val allUsed = System.currentTimeMillis()-t0
+      val avgUsed = allUsed/personIds.length
+      timeUsed.append( s"cypher1: persons:${personIds.length} allUsed:${allUsed}ms avgUsed:${avgUsed}ms")
     })
+
     Profiler.timing({
       println("interactive-short-2.cypher")
-      for (i <- 0 until times)
-        LDBC_short2(randomId(personId)).foreach(println)
+      println(s"persons length: ${personIds.length}")
+      val t0 =System.currentTimeMillis()
+      for (i <- 0 until personIds.length) {
+        val t1 = System.currentTimeMillis()
+        LDBC_short2(personIds(i)).foreach(println)
+        val used = System.currentTimeMillis() - t1
+        println(s"used(ms): ${used}")
+      }
+      val allUsed = System.currentTimeMillis()-t0
+      val avgUsed = allUsed/personIds.length
+      timeUsed.append( s"cypher2: persons:${personIds.length} allUsed:${allUsed}ms avgUsed:${avgUsed}ms")
     })
+
     Profiler.timing({
       println("interactive-short-3.cypher")
-      for (i <- 0 until times)
-        LDBC_short3(randomId(personId)).foreach(println)
+      println(s"persons length: ${personIds.length}")
+      val t0 =System.currentTimeMillis()
+      for (i <- 0 until personIds.length) {
+        val t1 = System.currentTimeMillis()
+        LDBC_short3(personIds(i)).foreach(println)
+        val used = System.currentTimeMillis() - t1
+        println(s"used(ms): ${used}")
+      }
+      val allUsed = System.currentTimeMillis()-t0
+      val avgUsed = allUsed/personIds.length
+      timeUsed.append( s"cypher3: persons:${personIds.length} allUsed:${allUsed}ms avgUsed:${avgUsed}ms")
     })
 
     Profiler.timing({
       println("interactive-short-5.cypher")
-      for (i <- 0 until times)
-        LDBC_short5(randomId(postId)).foreach(println)
+      println(s"posts length: ${postIds.length}")
+      val t0 =System.currentTimeMillis()
+      for (i <- 0 until postIds.length) {
+        val t1 = System.currentTimeMillis()
+        LDBC_short5(postIds(i)).foreach(println)
+        val used = System.currentTimeMillis() - t1
+        println(s"used(ms): ${used}")
+      }
+      val allUsed = System.currentTimeMillis()-t0
+      val avgUsed = allUsed/postIds.length
+      timeUsed.append( s"cypher5: posts:${postIds.length} allUsed:${allUsed}ms avgUsed:${avgUsed}ms")
     })
 
     Profiler.timing({
       println("interactive-short-7.cypher")
-      for (i <- 0 until times)
-        LDBC_short7(randomId(postId)).foreach(println)
+      println(s"posts length: ${postIds.length}")
+      val t0 =System.currentTimeMillis()
+      for (i <- 0 until postIds.length) {
+        val t1 = System.currentTimeMillis()
+        LDBC_short7(postIds(i)).foreach(println)
+        val used = System.currentTimeMillis() - t1
+        println(s"used(ms): ${used}")
+      }
+      val allUsed = System.currentTimeMillis()-t0
+      val avgUsed = allUsed/postIds.length
+      timeUsed.append( s"cypher7: posts:${postIds.length} allUsed:${allUsed}ms avgUsed:${avgUsed}ms")
     })
 
     Profiler.timing({
       println("interactive-short-4.cypher")
-      for (i <- 0 until times)
-        LDBC_short4(randomId(commentId)).foreach(println)
+      println(s"comments length: ${commentIds.length}")
+      val t0 =System.currentTimeMillis()
+      for (i <- 0 until commentIds.length) {
+        val t1 = System.currentTimeMillis()
+        LDBC_short4(commentIds(i)).foreach(println)
+        val used = System.currentTimeMillis() - t1
+        println(s"used(ms): ${used}")
+      }
+      val allUsed = System.currentTimeMillis()-t0
+      val avgUsed = allUsed/commentIds.length
+      timeUsed.append( s"cypher4: comments:${commentIds.length} allUsed:${allUsed}ms avgUsed:${avgUsed}ms")
     })
 
     Profiler.timing({
       println("interactive-short-6.cypher")
-      for (i <- 0 until times)
-        LDBC_short6(randomId(commentId)).foreach(println)
+      println(s"comments length: ${commentIds.length}")
+      val t0 =System.currentTimeMillis()
+      for (i <- 0 until commentIds.length) {
+        val t1 = System.currentTimeMillis()
+        LDBC_short6(commentIds(i)).foreach(println)
+        val used = System.currentTimeMillis() - t1
+        println(s"used(ms): ${used}")
+      }
+      val allUsed = System.currentTimeMillis()-t0
+      val avgUsed = allUsed/commentIds.length
+      timeUsed.append( s"cypher6: comments:${commentIds.length} allUsed:${allUsed}ms avgUsed:${avgUsed}ms")
     })
 
+    println(timeUsed.toList)
 
   }
 
