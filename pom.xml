@@ -13,6 +13,7 @@
         <module>kernel-performance-tests</module>
         <module>kernel</module>
         <module>tools</module>
+        <module>neo4j-performance-tests</module>
     </modules>
 
     <properties>

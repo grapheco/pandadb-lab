@@ -1,37 +1,31 @@
 package cn.pandadb.itest.performance
 
-import java.io.{BufferedReader, FileInputStream, InputStreamReader}
+import java.io.{BufferedReader, File, FileInputStream, InputStreamReader}
 
-import cn.pandadb.kernel.kv.GraphFacade
-import cn.pandadb.kernel.kv.index.IndexStoreAPI
-import cn.pandadb.kernel.kv.meta.Statistics
-import cn.pandadb.kernel.kv.node.NodeStoreAPI
-import cn.pandadb.kernel.kv.relation.RelationStoreAPI
-import cn.pandadb.kernel.store.{NodeStoreSPI, RelationStoreSPI, StoredNodeWithProperty}
-import cn.pandadb.kernel.util.Profiler
-import org.grapheco.lynx.{LynxNull, LynxValue, NodeFilter}
+import org.neo4j.graphdb.GraphDatabaseService
+import org.neo4j.graphdb.facade.GraphDatabaseFacadeFactory
+import org.neo4j.graphdb.factory.GraphDatabaseFactory
+import org.neo4j.io.fs.FileUtils
 
 import scala.collection.mutable.ArrayBuffer
-import scala.util.Random
 
-object LdbcTestAllTest {
-  var nodeStore: NodeStoreSPI = _
-  var relationStore: RelationStoreSPI = _
-  var indexStore: IndexStoreAPI = _
-  var statistics: Statistics = _
-  var graphFacade: GraphFacade = _
+object LdbcNeo4jEmbeddingTest {
+  var db: GraphDatabaseService = null
 
   def main(args: Array[String]): Unit = {
     if(args.length < 1) {
-      println("需要数据路径")
+      println("输入neo4j数据路径")
       return
     }
     val dbPath = args(0)
     println(s"数据路径： ${dbPath}")
 
-    var personIds = Array("700000002540559", "708796094477119")
-    var postIds = Array("787032086215979", "787032086215980")
-    var commentIds = Array("827766353710741", "827766353710742")
+    var personIds = Array("728587305677895","713194141640247","708796096049431","704398047793663","730786327096127","708796093788047","721990233553719",
+      "704398047653247","719791212536327","700000000677607")
+    var postIds = Array("892585202482764","787032086217147","751847714130924","646294597865129","857400830398294","646294597865279","646294597865280",
+      "787032086220165","787032086220166","857400830395884")
+    var commentIds = Array("827766353710753","616660121177939","581475749089386","687028865356107","581475749089801","440738260734629","440738260734757",
+      "440738260734843","440738260734844","440738260734845")
 
     if(args.length > 1) {
       val idPath: String = args(1)
@@ -53,64 +47,58 @@ object LdbcTestAllTest {
       }
     }
 
-    setup(dbPath)
-    val begin = System.currentTimeMillis()
-    println(s"已创建Facade | time: ${begin}")
-    println("开始测试")
-    LDBC(personIds=personIds, postIds = postIds, commentIds = commentIds)
-    val end = System.currentTimeMillis()
-    val use = end - begin
-    println(s"测试结束 | time(Millis): ${use}  ")
+    initDB(dbPath)
 
-    graphFacade.close()
+    runTest(personIds, postIds, commentIds)
 
+    db.shutdown()
+  }
+
+  def initDB(dbPath: String): Unit = {
+    val dbFile = new File(dbPath)
+    if (!dbFile.exists()) {
+      throw new Exception(s"data not exist: $dbPath")
+    }
+    db = new GraphDatabaseFactory().newEmbeddedDatabaseBuilder(dbFile).
+      newGraphDatabase()
+    println(s"已加载数据库：$dbPath")
+  }
+
+  def timing[T](f: => T): T = {
+    val t1 = System.currentTimeMillis()
+    val t = f
+    val t2 = System.currentTimeMillis()
+    println(s"time cost: ${t2 - t1} ms")
+    t
+  }
+
+  def runCypher(cypher:String): Unit = {
+    val res = db.execute(cypher)
+    while (res.hasNext) {
+      println(res.next())
+    }
   }
 
 
+  def runTest(personIds:Array[String], postIds:Array[String], commentIds:Array[String]): Unit = {
+    println(s"personId: ${personIds.toList}")
+    println(s"postId: ${postIds.toList}")
+    println(s"commentId: ${commentIds.toList}")
 
-  def setup(dbPath: String="./testdata"): Unit = {
-    println(s"数据路径：${dbPath}")
-    nodeStore = new NodeStoreAPI(dbPath)
-    relationStore = new RelationStoreAPI(dbPath)
-    indexStore = new IndexStoreAPI(dbPath)
-    statistics = new Statistics(dbPath)
-
-    graphFacade = new GraphFacade(
-      nodeStore,
-      relationStore,
-      indexStore,
-      statistics,
-      {}
-    )
-  }
-
-
-
-
-  def randomId(array: Array[String]): String = {
-    array(Random.nextInt(array.length))
-  }
-
-
-  def LDBC(personIds:Array[String], postIds:Array[String], commentIds:Array[String]): Unit ={
     println(s"personId: ${personIds.toList}")
     println(s"postId: ${postIds.toList}")
     println(s"commentId: ${commentIds.toList}")
 
     val timeUsed = scala.collection.mutable.ArrayBuffer[String]()
 
-    Profiler.timing({
-      println("preheat")
-      LDBC_short2(randomId(personIds)).foreach(println)
-    })
 
-    Profiler.timing({
+    timing({
       println("interactive-short-1.cypher")
       println(s"persons length: ${personIds.length}")
       val t0 =System.currentTimeMillis()
       for (i <- 0 until personIds.length) {
         val t1 = System.currentTimeMillis()
-        LDBC_short1(personIds(i)).foreach(println)
+        LDBC_short1(personIds(i))
         val used = System.currentTimeMillis() - t1
         println(s"used(ms): ${used}")
       }
@@ -119,13 +107,13 @@ object LdbcTestAllTest {
       timeUsed.append( s"cypher1: persons:${personIds.length} allUsed:${allUsed}ms avgUsed:${avgUsed}ms")
     })
 
-    Profiler.timing({
+    timing({
       println("interactive-short-2.cypher")
       println(s"persons length: ${personIds.length}")
       val t0 =System.currentTimeMillis()
       for (i <- 0 until personIds.length) {
         val t1 = System.currentTimeMillis()
-        LDBC_short2(personIds(i)).foreach(println)
+        LDBC_short2(personIds(i))
         val used = System.currentTimeMillis() - t1
         println(s"used(ms): ${used}")
       }
@@ -134,13 +122,13 @@ object LdbcTestAllTest {
       timeUsed.append( s"cypher2: persons:${personIds.length} allUsed:${allUsed}ms avgUsed:${avgUsed}ms")
     })
 
-    Profiler.timing({
+    timing({
       println("interactive-short-3.cypher")
       println(s"persons length: ${personIds.length}")
       val t0 =System.currentTimeMillis()
       for (i <- 0 until personIds.length) {
         val t1 = System.currentTimeMillis()
-        LDBC_short3(personIds(i)).foreach(println)
+        LDBC_short3(personIds(i))
         val used = System.currentTimeMillis() - t1
         println(s"used(ms): ${used}")
       }
@@ -149,13 +137,13 @@ object LdbcTestAllTest {
       timeUsed.append( s"cypher3: persons:${personIds.length} allUsed:${allUsed}ms avgUsed:${avgUsed}ms")
     })
 
-    Profiler.timing({
+    timing({
       println("interactive-short-5.cypher")
       println(s"posts length: ${postIds.length}")
       val t0 =System.currentTimeMillis()
       for (i <- 0 until postIds.length) {
         val t1 = System.currentTimeMillis()
-        LDBC_short5(postIds(i)).foreach(println)
+        LDBC_short5(postIds(i))
         val used = System.currentTimeMillis() - t1
         println(s"used(ms): ${used}")
       }
@@ -164,13 +152,13 @@ object LdbcTestAllTest {
       timeUsed.append( s"cypher5: posts:${postIds.length} allUsed:${allUsed}ms avgUsed:${avgUsed}ms")
     })
 
-    Profiler.timing({
+    timing({
       println("interactive-short-7.cypher")
       println(s"posts length: ${postIds.length}")
       val t0 =System.currentTimeMillis()
       for (i <- 0 until postIds.length) {
         val t1 = System.currentTimeMillis()
-        LDBC_short7(postIds(i)).foreach(println)
+        LDBC_short7(postIds(i))
         val used = System.currentTimeMillis() - t1
         println(s"used(ms): ${used}")
       }
@@ -179,13 +167,13 @@ object LdbcTestAllTest {
       timeUsed.append( s"cypher7: posts:${postIds.length} allUsed:${allUsed}ms avgUsed:${avgUsed}ms")
     })
 
-    Profiler.timing({
+    timing({
       println("interactive-short-4.cypher")
       println(s"comments length: ${commentIds.length}")
       val t0 =System.currentTimeMillis()
       for (i <- 0 until commentIds.length) {
         val t1 = System.currentTimeMillis()
-        LDBC_short4(commentIds(i)).foreach(println)
+        LDBC_short4(commentIds(i))
         val used = System.currentTimeMillis() - t1
         println(s"used(ms): ${used}")
       }
@@ -194,13 +182,13 @@ object LdbcTestAllTest {
       timeUsed.append( s"cypher4: comments:${commentIds.length} allUsed:${allUsed}ms avgUsed:${avgUsed}ms")
     })
 
-    Profiler.timing({
+    timing({
       println("interactive-short-6.cypher")
       println(s"comments length: ${commentIds.length}")
       val t0 =System.currentTimeMillis()
       for (i <- 0 until commentIds.length) {
         val t1 = System.currentTimeMillis()
-        LDBC_short6(commentIds(i)).foreach(println)
+        LDBC_short6(commentIds(i))
         val used = System.currentTimeMillis() - t1
         println(s"used(ms): ${used}")
       }
@@ -210,20 +198,9 @@ object LdbcTestAllTest {
     })
 
     println(timeUsed.toList)
-
   }
 
-  def runCypher(cypher:String): ArrayBuffer[Any] = {
-    val res = graphFacade.cypher(cypher)
-    val results = ArrayBuffer[Any]()
-    val records = res.records()
-    while (records.hasNext) {
-      results.append(records.next())
-    }
-    results
-  }
-
-  def LDBC_short1(personId: String): Iterable[Any] = {
+  def LDBC_short1(personId: String): Unit = {
     val cypherStr = s"""MATCH (n:person {id:"$personId"})-[:isLocatedIn]->(p:place)
                       RETURN  n.firstName AS firstName,  n.lastName AS lastName,  n.birthday AS birthday,
                         n.locationIP AS locationIP,  n.browserUsed AS browserUsed,  p.id AS cityId,
@@ -233,7 +210,7 @@ object LdbcTestAllTest {
     runCypher(cypherStr)
   }
 
-  def LDBC_short2(personId: String): Iterable[Any] = {
+  def LDBC_short2(personId: String): Unit = {
     val cypherStr = s"""MATCH (:person {id:"$personId"})<-[:hasCreator]-(m)-[:replyOf]->(p:post)
                       -[:hasCreator]->(c)
                       RETURN  m.id AS messageId,  m.creationDate AS messageCreationDate,
@@ -244,7 +221,7 @@ object LdbcTestAllTest {
     runCypher(cypherStr)
   }
 
-  def LDBC_short3(personId: String): Iterable[Any] = {
+  def LDBC_short3(personId: String): Unit = {
     val cypherStr = s"""MATCH (n:person {id:"$personId"})-[r:knows]-(friend)
                       RETURN
                         friend.id AS personId,  friend.firstName AS firstName,  friend.lastName AS lastName,
@@ -253,22 +230,22 @@ object LdbcTestAllTest {
     runCypher(cypherStr)
   }
 
-  def LDBC_short4(commentId: String): Iterable[Any] = {
-    val cypherStr = s"""MATCH (m:comment {id:$commentId})
+  def LDBC_short4(commentId: String): Unit = {
+    val cypherStr = s"""MATCH (m:comment {id:"$commentId"})
                     RETURN  m.creationDate AS messageCreationDate,  m.content as content"""
     println(cypherStr)
     runCypher(cypherStr)
   }
 
-  def LDBC_short5(postId: String): Iterable[Any] = {
-    val cypherStr = s"""MATCH (m:post {id:$postId})-[:hasCreator]->(p:person)
+  def LDBC_short5(postId: String): Unit = {
+    val cypherStr = s"""MATCH (m:post {id:"$postId"})-[:hasCreator]->(p:person)
                     RETURN  p.id AS personId,  p.firstName AS firstName,  p.lastName AS lastName"""
     println(cypherStr)
     runCypher(cypherStr)
   }
 
-  def LDBC_short6(commentId: String): Iterable[Any] = {
-    val cypherStr = s"""MATCH (m:comment{id:$commentId})-[:replyOf]->(p:post)<-[:containerOf]-(f:forum)-[:hasModerator]->(mod:person)
+  def LDBC_short6(commentId: String): Unit = {
+    val cypherStr = s"""MATCH (m:comment{id:"$commentId"})-[:replyOf]->(p:post)<-[:containerOf]-(f:forum)-[:hasModerator]->(mod:person)
                     RETURN
                       f.id AS forumId,  f.title AS forumTitle,  mod.id AS moderatorId,  mod.firstName AS moderatorFirstName,
                       mod.lastName AS moderatorLastName"""
@@ -276,8 +253,8 @@ object LdbcTestAllTest {
     runCypher(cypherStr)
   }
 
-  def LDBC_short7(postId: String): Iterable[Any] = {
-    val cypherStr = s"""MATCH (m:post{id:$postId})<-[:replyOf]-(c:comment)-[:hasCreator]->(p:person)
+  def LDBC_short7(postId: String): Unit = {
+    val cypherStr = s"""MATCH (m:post{id:"$postId"})<-[:replyOf]-(c:comment)-[:hasCreator]->(p:person)
       MATCH (m)-[:hasCreator]->(a:person)-[r:knows]-(p)
       RETURN
         c.id AS commentId,  c.content AS commentContent,  c.creationDate AS commentCreationDate,
@@ -285,4 +262,7 @@ object LdbcTestAllTest {
     println(cypherStr)
     runCypher(cypherStr)
   }
+
+
+
 }

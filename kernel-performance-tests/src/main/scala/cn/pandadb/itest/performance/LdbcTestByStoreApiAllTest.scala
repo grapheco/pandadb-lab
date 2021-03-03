@@ -333,10 +333,10 @@ object LdbcTestByStoreApiAllTest {
 
     val timeUsed = scala.collection.mutable.ArrayBuffer[String]()
 
-    Profiler.timing({
-      println("preheat")
-      LDBC_short2(randomId(personIds)).foreach(println)
-    })
+//    Profiler.timing({
+//      println("preheat")
+//      LDBC_short2(randomId(personIds)).foreach(println)
+//    })
 
     Profiler.timing({
       println("interactive-short-1.cypher")
