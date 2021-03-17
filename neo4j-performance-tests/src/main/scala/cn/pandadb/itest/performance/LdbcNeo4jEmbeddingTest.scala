@@ -8,6 +8,7 @@ import org.neo4j.graphdb.factory.GraphDatabaseFactory
 import org.neo4j.io.fs.FileUtils
 
 import scala.collection.mutable.ArrayBuffer
+import scala.collection.convert._
 
 object LdbcNeo4jEmbeddingTest {
   var db: GraphDatabaseService = null
@@ -72,11 +73,14 @@ object LdbcNeo4jEmbeddingTest {
     t
   }
 
-  def runCypher(cypher:String): Unit = {
+  def runCypher(cypher:String): Int = {
     val res = db.execute(cypher)
+    var resCount = 0
     while (res.hasNext) {
       println(res.next())
+      resCount += 1
     }
+    resCount
   }
 
 
@@ -96,111 +100,126 @@ object LdbcNeo4jEmbeddingTest {
       println("interactive-short-1.cypher")
       println(s"persons length: ${personIds.length}")
       val t0 =System.currentTimeMillis()
+      val resCount = ArrayBuffer[Int]()
       for (i <- 0 until personIds.length) {
         val t1 = System.currentTimeMillis()
-        LDBC_short1(personIds(i))
+        val resSize = LDBC_short1(personIds(i))
+        resCount.append(resSize)
         val used = System.currentTimeMillis() - t1
         println(s"used(ms): ${used}")
       }
       val allUsed = System.currentTimeMillis()-t0
       val avgUsed = allUsed/personIds.length
-      timeUsed.append( s"cypher1: persons:${personIds.length} allUsed:${allUsed}ms avgUsed:${avgUsed}ms")
+      timeUsed.append( s"cypher1: persons:${personIds.length} allUsed:${allUsed}ms avgUsed:${avgUsed}ms resultsLength: ${resCount.toList}")
     })
 
     timing({
       println("interactive-short-2.cypher")
       println(s"persons length: ${personIds.length}")
       val t0 =System.currentTimeMillis()
+      val resCount = ArrayBuffer[Int]()
       for (i <- 0 until personIds.length) {
         val t1 = System.currentTimeMillis()
-        LDBC_short2(personIds(i))
+        val resSize = LDBC_short2(personIds(i))
+        resCount.append(resSize)
         val used = System.currentTimeMillis() - t1
         println(s"used(ms): ${used}")
       }
       val allUsed = System.currentTimeMillis()-t0
       val avgUsed = allUsed/personIds.length
-      timeUsed.append( s"cypher2: persons:${personIds.length} allUsed:${allUsed}ms avgUsed:${avgUsed}ms")
+      timeUsed.append( s"cypher2: persons:${personIds.length} allUsed:${allUsed}ms avgUsed:${avgUsed}ms resultsLength: ${resCount.toList}")
     })
 
     timing({
       println("interactive-short-3.cypher")
       println(s"persons length: ${personIds.length}")
       val t0 =System.currentTimeMillis()
+      val resCount = ArrayBuffer[Int]()
       for (i <- 0 until personIds.length) {
         val t1 = System.currentTimeMillis()
-        LDBC_short3(personIds(i))
+        val resSize = LDBC_short3(personIds(i))
+        resCount.append(resSize)
         val used = System.currentTimeMillis() - t1
         println(s"used(ms): ${used}")
       }
       val allUsed = System.currentTimeMillis()-t0
       val avgUsed = allUsed/personIds.length
-      timeUsed.append( s"cypher3: persons:${personIds.length} allUsed:${allUsed}ms avgUsed:${avgUsed}ms")
-    })
-
-    timing({
-      println("interactive-short-5.cypher")
-      println(s"posts length: ${postIds.length}")
-      val t0 =System.currentTimeMillis()
-      for (i <- 0 until postIds.length) {
-        val t1 = System.currentTimeMillis()
-        LDBC_short5(postIds(i))
-        val used = System.currentTimeMillis() - t1
-        println(s"used(ms): ${used}")
-      }
-      val allUsed = System.currentTimeMillis()-t0
-      val avgUsed = allUsed/postIds.length
-      timeUsed.append( s"cypher5: posts:${postIds.length} allUsed:${allUsed}ms avgUsed:${avgUsed}ms")
-    })
-
-    timing({
-      println("interactive-short-7.cypher")
-      println(s"posts length: ${postIds.length}")
-      val t0 =System.currentTimeMillis()
-      for (i <- 0 until postIds.length) {
-        val t1 = System.currentTimeMillis()
-        LDBC_short7(postIds(i))
-        val used = System.currentTimeMillis() - t1
-        println(s"used(ms): ${used}")
-      }
-      val allUsed = System.currentTimeMillis()-t0
-      val avgUsed = allUsed/postIds.length
-      timeUsed.append( s"cypher7: posts:${postIds.length} allUsed:${allUsed}ms avgUsed:${avgUsed}ms")
+      timeUsed.append( s"cypher3: persons:${personIds.length} allUsed:${allUsed}ms avgUsed:${avgUsed}ms resultsLength: ${resCount.toList}")
     })
 
     timing({
       println("interactive-short-4.cypher")
       println(s"comments length: ${commentIds.length}")
       val t0 =System.currentTimeMillis()
+      val resCount = ArrayBuffer[Int]()
       for (i <- 0 until commentIds.length) {
         val t1 = System.currentTimeMillis()
-        LDBC_short4(commentIds(i))
+        val resSize = LDBC_short4(commentIds(i))
+        resCount.append(resSize)
         val used = System.currentTimeMillis() - t1
         println(s"used(ms): ${used}")
       }
       val allUsed = System.currentTimeMillis()-t0
       val avgUsed = allUsed/commentIds.length
-      timeUsed.append( s"cypher4: comments:${commentIds.length} allUsed:${allUsed}ms avgUsed:${avgUsed}ms")
+      timeUsed.append( s"cypher4: comments:${commentIds.length} allUsed:${allUsed}ms avgUsed:${avgUsed}ms resultsLength: ${resCount.toList}")
+    })
+
+    timing({
+      println("interactive-short-5.cypher")
+      println(s"posts length: ${postIds.length}")
+      val t0 =System.currentTimeMillis()
+      val resCount = ArrayBuffer[Int]()
+      for (i <- 0 until postIds.length) {
+        val t1 = System.currentTimeMillis()
+        val resSize = LDBC_short5(postIds(i))
+        resCount.append(resSize)
+        val used = System.currentTimeMillis() - t1
+        println(s"used(ms): ${used}")
+      }
+      val allUsed = System.currentTimeMillis()-t0
+      val avgUsed = allUsed/postIds.length
+      timeUsed.append( s"cypher5: posts:${postIds.length} allUsed:${allUsed}ms avgUsed:${avgUsed}ms resultsLength: ${resCount.toList}")
     })
 
     timing({
       println("interactive-short-6.cypher")
       println(s"comments length: ${commentIds.length}")
       val t0 =System.currentTimeMillis()
+      val resCount = ArrayBuffer[Int]()
       for (i <- 0 until commentIds.length) {
         val t1 = System.currentTimeMillis()
-        LDBC_short6(commentIds(i))
+        val resSize = LDBC_short6(commentIds(i))
+        resCount.append(resSize)
         val used = System.currentTimeMillis() - t1
         println(s"used(ms): ${used}")
       }
       val allUsed = System.currentTimeMillis()-t0
       val avgUsed = allUsed/commentIds.length
-      timeUsed.append( s"cypher6: comments:${commentIds.length} allUsed:${allUsed}ms avgUsed:${avgUsed}ms")
+      timeUsed.append( s"cypher6: comments:${commentIds.length} allUsed:${allUsed}ms avgUsed:${avgUsed}ms resultsLength: ${resCount.toList}")
     })
+
+    timing({
+      println("interactive-short-7.cypher")
+      println(s"posts length: ${postIds.length}")
+      val t0 =System.currentTimeMillis()
+      val resCount = ArrayBuffer[Int]()
+      for (i <- 0 until postIds.length) {
+        val t1 = System.currentTimeMillis()
+        val resSize = LDBC_short7(postIds(i))
+        resCount.append(resSize)
+        val used = System.currentTimeMillis() - t1
+        println(s"used(ms): ${used}")
+      }
+      val allUsed = System.currentTimeMillis()-t0
+      val avgUsed = allUsed/postIds.length
+      timeUsed.append( s"cypher7: posts:${postIds.length} allUsed:${allUsed}ms avgUsed:${avgUsed}ms resultsLength: ${resCount.toList}")
+    })
+
 
     println(timeUsed.toList)
   }
 
-  def LDBC_short1(personId: String): Unit = {
+  def LDBC_short1(personId: String): Int = {
     val cypherStr = s"""MATCH (n:person {id:"$personId"})-[:isLocatedIn]->(p:place)
                       RETURN  n.firstName AS firstName,  n.lastName AS lastName,  n.birthday AS birthday,
                         n.locationIP AS locationIP,  n.browserUsed AS browserUsed,  p.id AS cityId,
@@ -210,7 +229,7 @@ object LdbcNeo4jEmbeddingTest {
     runCypher(cypherStr)
   }
 
-  def LDBC_short2(personId: String): Unit = {
+  def LDBC_short2(personId: String): Int = {
     val cypherStr = s"""MATCH (:person {id:"$personId"})<-[:hasCreator]-(m)-[:replyOf]->(p:post)
                       -[:hasCreator]->(c)
                       RETURN  m.id AS messageId,  m.creationDate AS messageCreationDate,
@@ -221,7 +240,7 @@ object LdbcNeo4jEmbeddingTest {
     runCypher(cypherStr)
   }
 
-  def LDBC_short3(personId: String): Unit = {
+  def LDBC_short3(personId: String): Int = {
     val cypherStr = s"""MATCH (n:person {id:"$personId"})-[r:knows]-(friend)
                       RETURN
                         friend.id AS personId,  friend.firstName AS firstName,  friend.lastName AS lastName,
@@ -230,21 +249,21 @@ object LdbcNeo4jEmbeddingTest {
     runCypher(cypherStr)
   }
 
-  def LDBC_short4(commentId: String): Unit = {
+  def LDBC_short4(commentId: String): Int = {
     val cypherStr = s"""MATCH (m:comment {id:"$commentId"})
                     RETURN  m.creationDate AS messageCreationDate,  m.content as content"""
     println(cypherStr)
     runCypher(cypherStr)
   }
 
-  def LDBC_short5(postId: String): Unit = {
+  def LDBC_short5(postId: String): Int = {
     val cypherStr = s"""MATCH (m:post {id:"$postId"})-[:hasCreator]->(p:person)
                     RETURN  p.id AS personId,  p.firstName AS firstName,  p.lastName AS lastName"""
     println(cypherStr)
     runCypher(cypherStr)
   }
 
-  def LDBC_short6(commentId: String): Unit = {
+  def LDBC_short6(commentId: String): Int = {
     val cypherStr = s"""MATCH (m:comment{id:"$commentId"})-[:replyOf]->(p:post)<-[:containerOf]-(f:forum)-[:hasModerator]->(mod:person)
                     RETURN
                       f.id AS forumId,  f.title AS forumTitle,  mod.id AS moderatorId,  mod.firstName AS moderatorFirstName,
@@ -253,7 +272,7 @@ object LdbcNeo4jEmbeddingTest {
     runCypher(cypherStr)
   }
 
-  def LDBC_short7(postId: String): Unit = {
+  def LDBC_short7(postId: String): Int = {
     val cypherStr = s"""MATCH (m:post{id:"$postId"})<-[:replyOf]-(c:comment)-[:hasCreator]->(p:person)
       MATCH (m)-[:hasCreator]->(a:person)-[r:knows]-(p)
       RETURN

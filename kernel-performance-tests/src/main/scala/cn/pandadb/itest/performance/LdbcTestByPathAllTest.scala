@@ -220,15 +220,18 @@ object LdbcTestByPathAllTest {
       println("interactive-short-1.cypher")
       println(s"persons length: ${personIds.length}")
       val t0 =System.currentTimeMillis()
+      val resCount = ArrayBuffer[Int]()
       for (i <- 0 until personIds.length) {
         val t1 = System.currentTimeMillis()
-        LDBC_short1(personIds(i)).foreach(println)
+        val results = LDBC_short1(personIds(i)).toList
+        resCount.append(results.length)
+        results.foreach(println)
         val used = System.currentTimeMillis() - t1
         println(s"used(ms): ${used}")
       }
       val allUsed = System.currentTimeMillis()-t0
       val avgUsed = allUsed/personIds.length
-      timeUsed.append( s"cypher1: persons:${personIds.length} allUsed:${allUsed}ms avgUsed:${avgUsed}ms")
+      timeUsed.append( s"cypher1: persons:${personIds.length} allUsed:${allUsed}ms avgUsed:${avgUsed}ms resultsLength: ${resCount.toList}")
     })
     println(timeUsed.toList)
 
@@ -236,15 +239,18 @@ object LdbcTestByPathAllTest {
       println("interactive-short-2.cypher")
       println(s"persons length: ${personIds.length}")
       val t0 =System.currentTimeMillis()
+      val resCount = ArrayBuffer[Int]()
       for (i <- 0 until personIds.length) {
         val t1 = System.currentTimeMillis()
-        LDBC_short2(personIds(i)).foreach(println)
+        val results = LDBC_short2(personIds(i)).toList
+        resCount.append(results.length)
+        results.foreach(println)
         val used = System.currentTimeMillis() - t1
         println(s"used(ms): ${used}")
       }
       val allUsed = System.currentTimeMillis()-t0
       val avgUsed = allUsed/personIds.length
-      timeUsed.append( s"cypher2: persons:${personIds.length} allUsed:${allUsed}ms avgUsed:${avgUsed}ms")
+      timeUsed.append( s"cypher2: persons:${personIds.length} allUsed:${allUsed}ms avgUsed:${avgUsed}ms resultsLength: ${resCount.toList}")
     })
     println(timeUsed.toList)
 
@@ -252,15 +258,18 @@ object LdbcTestByPathAllTest {
       println("interactive-short-3.cypher")
       println(s"persons length: ${personIds.length}")
       val t0 =System.currentTimeMillis()
+      val resCount = ArrayBuffer[Int]()
       for (i <- 0 until personIds.length) {
         val t1 = System.currentTimeMillis()
-        LDBC_short3(personIds(i)).foreach(println)
+        val results = LDBC_short3(personIds(i)).toList
+        resCount.append(results.length)
+        results.foreach(println)
         val used = System.currentTimeMillis() - t1
         println(s"used(ms): ${used}")
       }
       val allUsed = System.currentTimeMillis()-t0
       val avgUsed = allUsed/personIds.length
-      timeUsed.append( s"cypher3: persons:${personIds.length} allUsed:${allUsed}ms avgUsed:${avgUsed}ms")
+      timeUsed.append( s"cypher3: persons:${personIds.length} allUsed:${allUsed}ms avgUsed:${avgUsed}ms resultsLength: ${resCount.toList}")
     })
     println(timeUsed.toList)
 
@@ -270,15 +279,18 @@ object LdbcTestByPathAllTest {
       println("interactive-short-4.cypher")
       println(s"comments length: ${commentIds.length}")
       val t0 =System.currentTimeMillis()
+      val resCount = ArrayBuffer[Int]()
       for (i <- 0 until commentIds.length) {
         val t1 = System.currentTimeMillis()
-        LDBC_short4(commentIds(i)).foreach(println)
+        val results = LDBC_short4(commentIds(i)).toList
+        resCount.append(results.length)
+        results.foreach(println)
         val used = System.currentTimeMillis() - t1
         println(s"used(ms): ${used}")
       }
       val allUsed = System.currentTimeMillis()-t0
       val avgUsed = allUsed/commentIds.length
-      timeUsed.append( s"cypher4: comments:${commentIds.length} allUsed:${allUsed}ms avgUsed:${avgUsed}ms")
+      timeUsed.append( s"cypher4: comments:${commentIds.length} allUsed:${allUsed}ms avgUsed:${avgUsed}ms resultsLength: ${resCount.toList}")
     })
     println(timeUsed.toList)
 
@@ -286,15 +298,18 @@ object LdbcTestByPathAllTest {
       println("interactive-short-5.cypher")
       println(s"posts length: ${postIds.length}")
       val t0 =System.currentTimeMillis()
+      val resCount = ArrayBuffer[Int]()
       for (i <- 0 until postIds.length) {
         val t1 = System.currentTimeMillis()
-        LDBC_short5(postIds(i)).foreach(println)
+        val results = LDBC_short5(postIds(i)).toList
+        resCount.append(results.length)
+        results.foreach(println)
         val used = System.currentTimeMillis() - t1
         println(s"used(ms): ${used}")
       }
       val allUsed = System.currentTimeMillis()-t0
       val avgUsed = allUsed/postIds.length
-      timeUsed.append( s"cypher5: posts:${postIds.length} allUsed:${allUsed}ms avgUsed:${avgUsed}ms")
+      timeUsed.append( s"cypher5: posts:${postIds.length} allUsed:${allUsed}ms avgUsed:${avgUsed}ms resultsLength: ${resCount.toList}")
     })
     println(timeUsed.toList)
 
@@ -302,15 +317,18 @@ object LdbcTestByPathAllTest {
       println("interactive-short-6.cypher")
       println(s"comments length: ${commentIds.length}")
       val t0 =System.currentTimeMillis()
+      val resCount = ArrayBuffer[Int]()
       for (i <- 0 until commentIds.length) {
         val t1 = System.currentTimeMillis()
-        LDBC_short6(commentIds(i)).foreach(println)
+        val results = LDBC_short6(commentIds(i)).toList
+        resCount.append(results.length)
+        results.foreach(println)
         val used = System.currentTimeMillis() - t1
         println(s"used(ms): ${used}")
       }
       val allUsed = System.currentTimeMillis()-t0
       val avgUsed = allUsed/commentIds.length
-      timeUsed.append( s"cypher6: comments:${commentIds.length} allUsed:${allUsed}ms avgUsed:${avgUsed}ms")
+      timeUsed.append( s"cypher6: comments:${commentIds.length} allUsed:${allUsed}ms avgUsed:${avgUsed}ms resultsLength: ${resCount.toList}")
     })
     println(timeUsed.toList)
 
@@ -320,15 +338,18 @@ object LdbcTestByPathAllTest {
       println("interactive-short-7.cypher")
       println(s"posts length: ${postIds.length}")
       val t0 =System.currentTimeMillis()
+      val resCount = ArrayBuffer[Int]()
       for (i <- 0 until postIds.length) {
         val t1 = System.currentTimeMillis()
-        LDBC_short7(postIds(i)).foreach(println)
+        val results = LDBC_short7(postIds(i)).toList
+        resCount.append(results.length)
+        results.foreach(println)
         val used = System.currentTimeMillis() - t1
         println(s"used(ms): ${used}")
       }
       val allUsed = System.currentTimeMillis()-t0
       val avgUsed = allUsed/postIds.length
-      timeUsed.append( s"cypher7: posts:${postIds.length} allUsed:${allUsed}ms avgUsed:${avgUsed}ms")
+      timeUsed.append( s"cypher7: posts:${postIds.length} allUsed:${allUsed}ms avgUsed:${avgUsed}ms resultsLength: ${resCount.toList}")
     })
 
     println(timeUsed.toList)
