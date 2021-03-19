@@ -6,14 +6,22 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="serialize" />
+        <module name="kernel" />
+        <module name="tools" />
+        <module name="kernel-performance-tests3" />
         <module name="kernel-performance-tests" />
+        <module name="neo4j-performance-tests" />
+        <module name="serialize" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="kernel-performance-tests" target="1.8" />
+      <module name="kernel" target="1.8" />
+      <module name="kernel-performance-tests" target="8" />
+      <module name="kernel-performance-tests3" target="8" />
+      <module name="neo4j-performance-tests" target="8" />
       <module name="pandadb-lab" target="1.8" />
       <module name="serialize" target="1.8" />
+      <module name="tools" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

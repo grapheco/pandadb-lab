@@ -73,7 +73,8 @@ object LdbcNeo4jEmbeddingTest2 {
     val res = db.execute(cypher)
     var resCount = 0
     while (res.hasNext) {
-      println(res.next())
+//      println(res.next())
+      res.next()
       resCount += 1
     }
     resCount
@@ -128,7 +129,7 @@ object LdbcNeo4jEmbeddingTest2 {
       |  m.content as content""".stripMargin.replaceAll("\r\n"," "), //2
 
     """MATCH (n:person {id:"%s"})-[r:knows]-(friend)
-      |RETURN id(friend)""".stripMargin.replaceAll("\r\n"," "),     // 3
+      |RETURN friend""".stripMargin.replaceAll("\r\n"," "),     // 3
 
     """MATCH (n:person {id:"%s"})-[r:knows]-(friend)
       |RETURN
@@ -148,14 +149,14 @@ object LdbcNeo4jEmbeddingTest2 {
       |  n.gender AS gender,
       |  n.creationDate AS creationDate""".stripMargin.replaceAll("\r\n"," "),  //5
 
-    """MATCH (m:message {id:"%s"})-[:hasCreator]->(p:person)
+    """MATCH (m:comment {id:"%s"})-[:hasCreator]->(p:person)
       |RETURN
       |  p.id AS personId,
       |  p.firstName AS firstName,
       |  p.lastName AS lastName""".stripMargin.replaceAll("\r\n"," "),  //6
 
     """MATCH (n:person {id:"%s"}) -[:knows]-> () -[:knows]-> (m:person)
-      |RETURN id(m)""".stripMargin.replaceAll("\r\n"," "),    //7
+      |RETURN m""".stripMargin.replaceAll("\r\n"," "),    //7
 
     """MATCH (n:person {id:"%s"}) -[:knows]-> () -[:knows]-> (m:person)
       |RETURN m.firstName AS firstName,
@@ -199,6 +200,4 @@ object LdbcNeo4jEmbeddingTest2 {
       |  p.lastName AS replyAuthorLastName""".stripMargin.replaceAll("\r\n"," ") //12
 
   )
-
-
 }

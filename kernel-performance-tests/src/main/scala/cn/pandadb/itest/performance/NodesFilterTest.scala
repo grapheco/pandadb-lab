@@ -1,8 +1,5 @@
 package cn.pandadb.itest.performance
 
-import java.io.{BufferedReader, FileInputStream, InputStreamReader}
-
-import cn.pandadb.itest.performance.LdbcTestByStoreApi.LDBC
 import cn.pandadb.kernel.kv.GraphFacade
 import cn.pandadb.kernel.kv.index.IndexStoreAPI
 import cn.pandadb.kernel.kv.meta.Statistics

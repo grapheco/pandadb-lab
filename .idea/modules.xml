@@ -2,9 +2,13 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/kernel/kernel.iml" filepath="$PROJECT_DIR$/kernel/kernel.iml" />
       <module fileurl="file://$PROJECT_DIR$/kernel-performance-tests/kernel-performance-tests.iml" filepath="$PROJECT_DIR$/kernel-performance-tests/kernel-performance-tests.iml" />
+      <module fileurl="file://$PROJECT_DIR$/kernel-performance-tests3/kernel-performance-tests3.iml" filepath="$PROJECT_DIR$/kernel-performance-tests3/kernel-performance-tests3.iml" />
+      <module fileurl="file://$PROJECT_DIR$/neo4j-performance-tests/neo4j-performance-tests.iml" filepath="$PROJECT_DIR$/neo4j-performance-tests/neo4j-performance-tests.iml" />
       <module fileurl="file://$PROJECT_DIR$/pandadb-lab.iml" filepath="$PROJECT_DIR$/pandadb-lab.iml" />
       <module fileurl="file://$PROJECT_DIR$/serialize/serialize.iml" filepath="$PROJECT_DIR$/serialize/serialize.iml" />
+      <module fileurl="file://$PROJECT_DIR$/tools/tools.iml" filepath="$PROJECT_DIR$/tools/tools.iml" />
     </modules>
   </component>
 </project>
