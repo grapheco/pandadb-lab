@@ -1,0 +1,10 @@
+*.class
+*.log
+.idea
+target
+output
+*.iml
+**/testdata
+**/dependency-reduced-pom.xml
+**/.idea
+**/*.iml
