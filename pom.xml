@@ -11,10 +11,11 @@
     <modules>
         <module>serialize</module>
         <module>kernel-performance-tests</module>
-        <module>kernel</module>
         <module>tools</module>
         <module>neo4j-performance-tests</module>
         <module>kernel-performance-tests3</module>
+        <module>lmdb-storage</module>
+        <module>cypher-support-tests</module>
     </modules>
 
     <properties>
@@ -108,12 +109,12 @@
         </plugins>
     </build>
 
-    <repositories>
-        <repository>
-            <id>repos</id>
-            <name>Repository</name>
-            <url>http://10.0.82.220:8081/repository/maven-public/</url>
-        </repository>
-    </repositories>
+<!--    <repositories>-->
+<!--        <repository>-->
+<!--            <id>repos</id>-->
+<!--            <name>Repository</name>-->
+<!--            <url>http://10.0.82.220:8081/repository/maven-public/</url>-->
+<!--        </repository>-->
+<!--    </repositories>-->
     
 </project>

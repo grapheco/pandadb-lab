@@ -9,6 +9,7 @@ import cn.pandadb.kernel.kv.relation.RelationStoreAPI
 import cn.pandadb.kernel.store.{NodeStoreSPI, PandaNode, RelationStoreSPI, StoredNodeWithProperty}
 import cn.pandadb.kernel.kv.db.KeyValueDB
 import cn.pandadb.kernel.util.serializer.NodeSerializer
+import org.apache.commons.io.output.WriterOutputStream
 import org.grapheco.lynx.{LynxValue, NodeFilter}
 
 object ScanNodesTest {
